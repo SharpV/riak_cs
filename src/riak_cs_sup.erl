@@ -54,6 +54,12 @@ init([]) ->
         undefined ->
             WebLogDir = "log"
     end,
+    case application:get_env(riak_cs, rewrite_module) of
+        {ok, RewriteModule} ->
+            ok;
+        undefined ->
+            RewriteModule = riak_cs_s3_rewrite
+    end,
 
     %% Create child specifications
     WebConfig1 = [
@@ -62,7 +68,7 @@ init([]) ->
                  {port, Port},
                  {nodelay, true},
                  {log_dir, WebLogDir},
-                 {rewrite_module, riak_cs_s3_rewrite},
+                 {rewrite_module, RewriteModule},
                  {error_handler, riak_cs_wm_error_handler}],
     case application:get_env(riak_cs, ssl) of
         {ok, SSLOpts} ->
